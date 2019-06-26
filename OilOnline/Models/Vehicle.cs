@@ -14,7 +14,8 @@ namespace OilOnline.Models
         public string Model { get; set; }
         public int Year { get; set; }
         public int OilTypeId { get; set; }
+        public OilType Oil { get; set; }
         public int CustomerId { get; set; }
-        Customer Customer { get; set; }
+        public ApplicationUser Customer { get; set; }
     }
 }
