@@ -7,11 +7,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OilOnline.Data;
 
-namespace OilOnline.Migrations
+namespace OilOnline.Data.Migrations
 {
     [DbContext(typeof(OilOnlineContext))]
-    [Migration("20190628175502_myFirstMigration")]
-    partial class myFirstMigration
+    [Migration("20190628191554_delete-user-table")]
+    partial class deleteusertable
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -117,11 +117,13 @@ namespace OilOnline.Migrations
 
                     b.Property<DateTime>("DateAndTime");
 
-                    b.Property<decimal>("Latitude");
+                    b.Property<decimal>("Latitude")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Location");
 
-                    b.Property<decimal>("Longitude");
+                    b.Property<decimal>("Longitude")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("MechanicId");
 

@@ -19,7 +19,7 @@ namespace OilOnline.Data
         public DbSet<Vehicle> Vehicles { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<ApplicationUser>().ToTable("Users");
+           
             modelBuilder.Entity<OilType>().ToTable("Oil Type");
             modelBuilder.Entity<PaymentType>().ToTable("Payment Type");
             modelBuilder.Entity<Request>().ToTable("Request");
