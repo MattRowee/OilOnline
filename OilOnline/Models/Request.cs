@@ -16,7 +16,7 @@ namespace OilOnline.Models
         public Vehicle vehicle { get; set; }
         public int PaymentTypeId { get; set; }
         public PaymentType paymentType { get; set; }
-        public int MechanicId { get; set; }
+        public string MechanicId { get; set; }
         public ApplicationUser Mechanic { get; set; }
 
     }
