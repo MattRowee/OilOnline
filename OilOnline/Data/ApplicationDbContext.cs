@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using OilOnline.Models;
 
 namespace OilOnline.Data
 {
@@ -12,5 +13,6 @@ namespace OilOnline.Data
             : base(options)
         {
         }
+        public DbSet<ApplicationUser> ApplicationUsers { get; set; }
     }
 }
