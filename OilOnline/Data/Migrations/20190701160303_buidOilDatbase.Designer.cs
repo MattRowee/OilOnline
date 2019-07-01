@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OilOnline.Data;
 
 namespace OilOnline.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190701160303_buidOilDatbase")]
+    partial class buidOilDatbase
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -334,13 +336,13 @@ namespace OilOnline.Data.Migrations
                         {
                             Id = "00000000-ffff-ffff-ffff-ffffffffffff",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "ab0ab3c6-edaa-4c35-a98c-4dfa88ebc170",
+                            ConcurrencyStamp = "b4940d76-73a7-46c8-8aeb-cb34c313153d",
                             Email = "admin@admin.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@ADMIN.COM",
                             NormalizedUserName = "ADMIN@ADMIN.COM",
-                            PasswordHash = "AQAAAAEAACcQAAAAEOWKooZiAKAEEAvqSAVAOzqdVjD7OdRX6VIn82Hh5HWsxWDFaF2j55Hg0vL9p7qyjA==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEEN3MNRjF7ttzXUrQMcgc7JcqkNKLh/5GJyskvZhoNwIDQGKmsVnR707j3nOYgPMsw==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "7f434309-a4d9-48e9-9ebb-8803db794577",
                             TwoFactorEnabled = false,
