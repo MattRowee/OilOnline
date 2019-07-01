@@ -40,6 +40,36 @@ namespace OilOnline.Data
             var passwordHash = new PasswordHasher<ApplicationUser>();
             user.PasswordHash = passwordHash.HashPassword(user, "Admin8*");
             modelBuilder.Entity<ApplicationUser>().HasData(user);
+
+            modelBuilder.Entity<OilType>().HasData(
+               new OilType()
+               {
+                   Id = 1,
+                   Name = "Conventional",
+                   PricePerQuart = 20.00
+               },
+               new OilType()
+               {
+                   Id = 2,
+                   Name = "Full Synthetic",
+                   PricePerQuart = 24.00
+               },
+               new OilType()
+               {
+                   Id = 3,
+                   Name = "Synthetic Blend",
+                   PricePerQuart = 20.00
+               },
+               new OilType()
+               {
+                   Id = 4,
+                   Name = "High Mileage",
+                   PricePerQuart = 21.00
+               }
+              );
+               
+
+
         }
     }
 }
