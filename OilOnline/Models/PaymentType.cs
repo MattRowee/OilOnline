@@ -9,7 +9,7 @@ namespace OilOnline.Models
     {
         public int Id { get; set; }
         public string CardHolder { get; set; }
-        public int CardNumber { get; set; }
+        public Int64 CardNumber { get; set; }
         public int SecurityNumber { get; set; }
         public string ExpirationDate { get; set; }
         public string CustomerId { get; set; }
