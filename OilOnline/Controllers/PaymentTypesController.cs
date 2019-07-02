@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -11,28 +10,23 @@ using OilOnline.Models;
 
 namespace OilOnline.Controllers
 {
-    public class VehiclesController : Controller
+    public class PaymentTypesController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly UserManager<ApplicationUser> _userManager;
 
-        public VehiclesController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
+        public PaymentTypesController(ApplicationDbContext context)
         {
-            _userManager = userManager;
             _context = context;
         }
-        private Task<ApplicationUser> GetCurrentUserAsync() => _userManager.GetUserAsync(HttpContext.User);
 
-        // GET: Vehicles
+        // GET: PaymentTypes
         public async Task<IActionResult> Index()
         {
-            var currentUser = await GetCurrentUserAsync();
-            var applicationDbContext = _context.Vehicles.Include(v => v.Customer).Include(v => v.Oil)
-                .Where(vehicle => vehicle.CustomerId == currentUser.Id);
+            var applicationDbContext = _context.PaymentTypes.Include(p => p.Customer);
             return View(await applicationDbContext.ToListAsync());
         }
 
-        // GET: Vehicles/Details/5
+        // GET: PaymentTypes/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -40,47 +34,42 @@ namespace OilOnline.Controllers
                 return NotFound();
             }
 
-            var vehicle = await _context.Vehicles
-                .Include(v => v.Customer)
-                .Include(v => v.Oil)
+            var paymentType = await _context.PaymentTypes
+                .Include(p => p.Customer)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (vehicle == null)
+            if (paymentType == null)
             {
                 return NotFound();
             }
 
-            return View(vehicle);
+            return View(paymentType);
         }
 
-        // GET: Vehicles/Create
+        // GET: PaymentTypes/Create
         public IActionResult Create()
         {
-           
-            ViewData["OilTypeId"] = new SelectList(_context.OilTypes, "Id", "Name" );
+            ViewData["CustomerId"] = new SelectList(_context.ApplicationUsers, "Id", "Id");
             return View();
         }
 
-        // POST: Vehicles/Create
+        // POST: PaymentTypes/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,PhotoURL,PlateNumber,Make,Model,Year,OilTypeId,CustomerId")] Vehicle vehicle)
+        public async Task<IActionResult> Create([Bind("Id,CardHolder,CardNumber,SecurityNumber,ExpirationDate,CustomerId")] PaymentType paymentType)
         {
             if (ModelState.IsValid)
             {
-                ApplicationUser CurrentUser = await GetCurrentUserAsync();
-                vehicle.CustomerId = CurrentUser.Id;
-                _context.Add(vehicle);
+                _context.Add(paymentType);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CustomerId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", vehicle.CustomerId);
-            ViewData["OilTypeId"] = new SelectList(_context.OilTypes, "Id", "Id", vehicle.OilTypeId);
-            return View(vehicle);
+            ViewData["CustomerId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", paymentType.CustomerId);
+            return View(paymentType);
         }
 
-        // GET: Vehicles/Edit/5
+        // GET: PaymentTypes/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -88,24 +77,23 @@ namespace OilOnline.Controllers
                 return NotFound();
             }
 
-            var vehicle = await _context.Vehicles.FindAsync(id);
-            if (vehicle == null)
+            var paymentType = await _context.PaymentTypes.FindAsync(id);
+            if (paymentType == null)
             {
                 return NotFound();
             }
-            ViewData["CustomerId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", vehicle.CustomerId);
-            ViewData["OilTypeId"] = new SelectList(_context.OilTypes, "Id", "Name", vehicle.OilTypeId);
-            return View(vehicle);
+            ViewData["CustomerId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", paymentType.CustomerId);
+            return View(paymentType);
         }
 
-        // POST: Vehicles/Edit/5
+        // POST: PaymentTypes/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,PhotoURL,PlateNumber,Make,Model,Year,OilTypeId,CustomerId")] Vehicle vehicle)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,CardHolder,CardNumber,SecurityNumber,ExpirationDate,CustomerId")] PaymentType paymentType)
         {
-            if (id != vehicle.Id)
+            if (id != paymentType.Id)
             {
                 return NotFound();
             }
@@ -114,12 +102,12 @@ namespace OilOnline.Controllers
             {
                 try
                 {
-                    _context.Update(vehicle);
+                    _context.Update(paymentType);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!VehicleExists(vehicle.Id))
+                    if (!PaymentTypeExists(paymentType.Id))
                     {
                         return NotFound();
                     }
@@ -130,11 +118,11 @@ namespace OilOnline.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["OilTypeId"] = new SelectList(_context.OilTypes, "Id", "Name", vehicle.OilTypeId);
-            return View(vehicle);
+            ViewData["CustomerId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", paymentType.CustomerId);
+            return View(paymentType);
         }
 
-        // GET: Vehicles/Delete/5
+        // GET: PaymentTypes/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -142,32 +130,31 @@ namespace OilOnline.Controllers
                 return NotFound();
             }
 
-            var vehicle = await _context.Vehicles
-                .Include(v => v.Customer)
-                .Include(v => v.Oil)
+            var paymentType = await _context.PaymentTypes
+                .Include(p => p.Customer)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (vehicle == null)
+            if (paymentType == null)
             {
                 return NotFound();
             }
 
-            return View(vehicle);
+            return View(paymentType);
         }
 
-        // POST: Vehicles/Delete/5
+        // POST: PaymentTypes/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var vehicle = await _context.Vehicles.FindAsync(id);
-            _context.Vehicles.Remove(vehicle);
+            var paymentType = await _context.PaymentTypes.FindAsync(id);
+            _context.PaymentTypes.Remove(paymentType);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool VehicleExists(int id)
+        private bool PaymentTypeExists(int id)
         {
-            return _context.Vehicles.Any(e => e.Id == id);
+            return _context.PaymentTypes.Any(e => e.Id == id);
         }
     }
 }
