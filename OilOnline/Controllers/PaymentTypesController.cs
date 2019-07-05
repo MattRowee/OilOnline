@@ -26,7 +26,13 @@ namespace OilOnline.Controllers
         // GET: PaymentTypes
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.PaymentTypes.Include(p => p.Customer);
+            //var applicationDbContext = _context.Vehicles.Include(v => v.Customer).Include(v => v.Oil)
+            //    .Where(vehicle => vehicle.CustomerId == currentUser.Id);
+
+            var currentUser = await GetCurrentUserAsync();           
+            var applicationDbContext = _context.PaymentTypes
+                .Where(paymentTypes => paymentTypes.CustomerId == currentUser.Id);
+
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -65,6 +71,8 @@ namespace OilOnline.Controllers
         {
             if (ModelState.IsValid)
             {
+                ApplicationUser CurrentUser = await GetCurrentUserAsync();
+                paymentType.CustomerId = CurrentUser.Id;
                 _context.Add(paymentType);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
