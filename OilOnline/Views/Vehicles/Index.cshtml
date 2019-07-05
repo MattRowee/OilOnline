@@ -4,17 +4,17 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Your vehicles</h1>
+<h1>Your Vehicles</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create">Register a New Vehicle</a>
 </p>
 <table class="table">
     <thead>
         <tr>
-            <th>
+            @*<th>
                 @Html.DisplayNameFor(model => model.PhotoURL)
-            </th>
+            </th>*@
             <th>
                 @Html.DisplayNameFor(model => model.PlateNumber)
             </th>
@@ -37,9 +37,9 @@
     <tbody>
 @foreach (var item in Model) {
         <tr>
-            <td>
+            @*<td>
                 @Html.DisplayFor(modelItem => item.PhotoURL)
-            </td>
+            </td>*@
             <td>
                 @Html.DisplayFor(modelItem => item.PlateNumber)
             </td>

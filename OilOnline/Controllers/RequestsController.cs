@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -13,11 +14,14 @@ namespace OilOnline.Controllers
     public class RequestsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public RequestsController(ApplicationDbContext context)
+        public RequestsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
+            _userManager = userManager;
             _context = context;
         }
+        private Task<ApplicationUser> GetCurrentUserAsync() => _userManager.GetUserAsync(HttpContext.User);
 
         // GET: Requests
         public async Task<IActionResult> Index()
@@ -48,12 +52,30 @@ namespace OilOnline.Controllers
         }
 
         // GET: Requests/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            var currentUser = await GetCurrentUserAsync();
+            var userVehicles = _context.Vehicles.Where(vehicle => vehicle.CustomerId == currentUser.Id);
+            var vehiclesArray = userVehicles.ToList();
+            if (vehiclesArray.Count == 0)
+                
+            {
+                //Show("You must register a vehicle before requesting this service.");
+                
+                return RedirectToAction("Create", "Vehicles");
+            }
+            
             ViewData["MechanicId"] = new SelectList(_context.ApplicationUsers, "Id", "Id");
-            ViewData["PaymentTypeId"] = new SelectList(_context.PaymentTypes, "Id", "ExpirationDate");
-            ViewData["VehicleId"] = new SelectList(_context.Vehicles, "Id", "PlateNumber");
+            ViewData["PaymentTypeId"] = new SelectList(_context.PaymentTypes
+                .Where(paymentType => paymentType.CustomerId == currentUser.Id), "Id", "ExpirationDate");
+            ViewData["VehicleId"] = new SelectList(_context.Vehicles
+               .Where(vehicle => vehicle.CustomerId == currentUser.Id), "Id", "PlateNumber");
             return View();
+        }
+
+        private void Show(string redirectMessage)
+        {
+            throw new NotImplementedException();
         }
 
         // POST: Requests/Create
@@ -110,6 +132,8 @@ namespace OilOnline.Controllers
             {
                 try
                 {
+                    ApplicationUser CurrentUser = await GetCurrentUserAsync();
+                    request.MechanicId = CurrentUser.Id;
                     _context.Update(request);
                     await _context.SaveChangesAsync();
                 }

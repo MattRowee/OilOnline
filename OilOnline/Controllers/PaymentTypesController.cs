@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -13,16 +14,25 @@ namespace OilOnline.Controllers
     public class PaymentTypesController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public PaymentTypesController(ApplicationDbContext context)
+        public PaymentTypesController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
+            _userManager = userManager;
             _context = context;
         }
+        private Task<ApplicationUser> GetCurrentUserAsync() => _userManager.GetUserAsync(HttpContext.User);
 
         // GET: PaymentTypes
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.PaymentTypes.Include(p => p.Customer);
+            //var applicationDbContext = _context.Vehicles.Include(v => v.Customer).Include(v => v.Oil)
+            //    .Where(vehicle => vehicle.CustomerId == currentUser.Id);
+
+            var currentUser = await GetCurrentUserAsync();           
+            var applicationDbContext = _context.PaymentTypes
+                .Where(paymentTypes => paymentTypes.CustomerId == currentUser.Id);
+
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -61,6 +71,8 @@ namespace OilOnline.Controllers
         {
             if (ModelState.IsValid)
             {
+                ApplicationUser CurrentUser = await GetCurrentUserAsync();
+                paymentType.CustomerId = CurrentUser.Id;
                 _context.Add(paymentType);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));

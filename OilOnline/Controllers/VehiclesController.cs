@@ -89,6 +89,7 @@ namespace OilOnline.Controllers
             }
 
             var vehicle = await _context.Vehicles.FindAsync(id);
+            
             if (vehicle == null)
             {
                 return NotFound();
@@ -112,6 +113,8 @@ namespace OilOnline.Controllers
 
             if (ModelState.IsValid)
             {
+                ApplicationUser CurrentUser = await GetCurrentUserAsync();
+                vehicle.CustomerId = CurrentUser.Id;
                 try
                 {
                     _context.Update(vehicle);
