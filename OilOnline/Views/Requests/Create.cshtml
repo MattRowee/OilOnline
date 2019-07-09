@@ -34,15 +34,18 @@
             </div>
             <div class="form-group">
                 <label asp-for="VehicleId" class="control-label"></label>
-                <select asp-for="VehicleId" class ="form-control" asp-items="ViewBag.VehicleId">Select vehicle by plate</select>
-            </div>
-            <div class="form-group">
-                <label asp-for="PaymentTypeId" class="control-label"></label>
-                <select asp-for="PaymentTypeId" class ="form-control" asp-items="ViewBag.PaymentTypeId"></select>
+                <select asp-for="VehicleId" class="form-control" asp-items="ViewBag.VehicleId">Select vehicle by plate</select>
             </div>
             
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <label asp-for="PaymentTypeId" class="control-label"></label>
+                <select asp-for="PaymentTypeId" class="form-control" asp-items="ViewBag.PaymentTypeId"></select>
+            </div>
+            <div class="form-group">
+                <input value="Add Payment Type" onclick="location.href='@Url.Action("Create", "PaymentTypes")'"class="btn btn-primary" />
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Submit Request" onclick="location.href='@Url.Action("Index", "Vehicles")'" class="btn btn-primary" />
             </div>
         </form>
     </div>
