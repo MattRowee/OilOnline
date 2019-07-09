@@ -26,8 +26,17 @@ namespace OilOnline.Controllers
         // GET: Requests
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Requests.Include(r => r.Mechanic).Include(r => r.paymentType).Include(r => r.vehicle);
+            //var currentUser = await GetCurrentUserAsync();
+            //if (currentUser.IsMechanic == false)
+            //{
+            //    return RedirectToAction("Index", "Vehicles");
+            //}
+            var currentUser = await GetCurrentUserAsync();
+            var applicationDbContext = _context.Requests
+                .Where(r => r.vehicle.CustomerId == currentUser.Id);
             return View(await applicationDbContext.ToListAsync());
+            
+            
         }
 
         // GET: Requests/Details/5
@@ -89,12 +98,12 @@ namespace OilOnline.Controllers
             {
                 _context.Add(request);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                //return RedirectToAction("Index","Vehicles");
             }
             ViewData["MechanicId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", request.MechanicId);
             ViewData["PaymentTypeId"] = new SelectList(_context.PaymentTypes, "Id", "ExpirationDate", request.PaymentTypeId);
             ViewData["VehicleId"] = new SelectList(_context.Vehicles, "Id", "PlateNumber", request.VehicleId);
-            return View(request);
+            return RedirectToAction("Index", "Vehicles");
         }
 
         // GET: Requests/Edit/5

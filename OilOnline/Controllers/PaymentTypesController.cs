@@ -75,10 +75,9 @@ namespace OilOnline.Controllers
                 paymentType.CustomerId = CurrentUser.Id;
                 _context.Add(paymentType);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
             }
             ViewData["CustomerId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", paymentType.CustomerId);
-            return View(paymentType);
+            return RedirectToAction ("Create", "Requests");
         }
 
         // GET: PaymentTypes/Edit/5
