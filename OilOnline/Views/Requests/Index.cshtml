@@ -1,17 +1,21 @@
 ﻿@model IEnumerable<OilOnline.Models.Request>
-
+@*@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager*@
 @{
     ViewData["Title"] = "Index";
 }
 
 <h1>Oil Change Request Index</h1>
 
-<div class="form-group">
-    <input type="submit" value="All Requests" class="btn btn-primary" />
-</div>
-<div class="form-group">
-    <input type="submit" value="Accepted Requests" class="btn btn-primary" />
-</div>
+    <form class="form-group">
+        <input asp-controller="Requests" asp-action="Index" type="submit" value="All Requests" class="btn btn-primary" />
+    </form>
+
+    <form class="form-group" asp-controller="Requests" asp-action="Index" asp-route-acceptedRequests="acceptedRequests">
+        <input 
+               type="submit" value="Accepted Requests" class="btn btn-primary" />
+    </form>
+
 <table class="table">
     <thead>
         <tr>
@@ -38,31 +42,32 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.DateAndTime)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Location)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.vehicle.PlateNumber)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.vehicle.Make)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.vehicle.Model)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.vehicle.Year)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Accept</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DateAndTime)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Location)
+                </td>
+                <td>
+                    @Html.DisplayFor(model => item.vehicle.PlateNumber)
+                </td>
+                <td>
+                    @Html.DisplayFor(model => item.vehicle.Make)
+                </td>
+                <td>
+                    @Html.DisplayFor(model => item.vehicle.Model)
+                </td>
+                <td>
+                    @Html.DisplayFor(model => item.vehicle.Year)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Accept</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
