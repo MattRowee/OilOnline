@@ -24,19 +24,29 @@ namespace OilOnline.Controllers
         private Task<ApplicationUser> GetCurrentUserAsync() => _userManager.GetUserAsync(HttpContext.User);
 
         // GET: Requests
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string acceptedRequests)
         {
-            //var currentUser = await GetCurrentUserAsync();
-            //if (currentUser.IsMechanic == false)
-            //{
-            //    return RedirectToAction("Index", "Vehicles");
-            //}
+            //ViewData["acceptedRequests"] = acceptedRequests == "acceptedRequests";
+            
             var currentUser = await GetCurrentUserAsync();
-            var applicationDbContext = _context.Requests
-                .Where(r => r.vehicle.CustomerId == currentUser.Id);
-            return View(await applicationDbContext.ToListAsync());
-            
-            
+            var requests = from r in _context.Requests select r;
+            switch (acceptedRequests)
+            {
+                case "acceptedRequests":
+                    requests = requests.Where(r => r.MechanicId == currentUser.Id);
+                    break;
+            }
+            if (currentUser.IsMechanic == false)
+            {
+                    var applicationDbContext = await _context.Requests
+                    .Where(r => r.vehicle.CustomerId == currentUser.Id).ToListAsync();
+                return View(applicationDbContext);   
+            }
+            else {
+                //var applicationDbContext = await _context.Requests.ToListAsync();
+                return View(await requests.AsNoTracking().ToListAsync());
+                 }
+           
         }
 
         // GET: Requests/Details/5
@@ -119,9 +129,9 @@ namespace OilOnline.Controllers
             {
                 return NotFound();
             }
-            ViewData["MechanicId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", request.MechanicId);
-            ViewData["PaymentTypeId"] = new SelectList(_context.PaymentTypes, "Id", "Id", request.PaymentTypeId);
-            ViewData["VehicleId"] = new SelectList(_context.Vehicles, "Id", "Id", request.VehicleId);
+            //ViewData["MechanicId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", request.MechanicId);
+            //ViewData["PaymentTypeId"] = new SelectList(_context.PaymentTypes, "Id", "Id", request.PaymentTypeId);
+            //ViewData["VehicleId"] = new SelectList(_context.Vehicles, "Id", "Id", request.VehicleId);
             return View(request);
         }
 
@@ -141,6 +151,7 @@ namespace OilOnline.Controllers
             {
                 try
                 {
+                    
                     ApplicationUser CurrentUser = await GetCurrentUserAsync();
                     request.MechanicId = CurrentUser.Id;
                     _context.Update(request);
