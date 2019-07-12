@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
@@ -65,15 +66,28 @@ namespace OilOnline.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,PhotoURL,PlateNumber,Make,Model,Year,OilTypeId,CustomerId")] Vehicle vehicle)
+        public async Task<IActionResult> Create([Bind("Id,PlateNumber,Make,ImageUpload,Model,Year,OilTypeId,CustomerId")] Vehicle vehicle)
         {
             if (ModelState.IsValid)
             {
                 ApplicationUser CurrentUser = await GetCurrentUserAsync();
                 vehicle.CustomerId = CurrentUser.Id;
+                if (vehicle.ImageUpload != null)
+                {
+                    //Store the image in a temp location as it comes back from the uploader
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        await vehicle.ImageUpload.CopyToAsync(memoryStream);
+                        vehicle.VehicleImage = memoryStream.ToArray();
+                    }
+                }
+                
                 _context.Add(vehicle);
                 await _context.SaveChangesAsync();
+
+
                 return RedirectToAction(nameof(Index));
+
             }
             ViewData["CustomerId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", vehicle.CustomerId);
             ViewData["OilTypeId"] = new SelectList(_context.OilTypes, "Id", "Id", vehicle.OilTypeId);
@@ -104,7 +118,7 @@ namespace OilOnline.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,PhotoURL,PlateNumber,Make,Model,Year,OilTypeId,CustomerId")] Vehicle vehicle)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,PlateNumber,ImageUpload,Make,Model,Year,OilTypeId,CustomerId")] Vehicle vehicle)
         {
             if (id != vehicle.Id)
             {
@@ -115,6 +129,39 @@ namespace OilOnline.Controllers
             {
                 ApplicationUser CurrentUser = await GetCurrentUserAsync();
                 vehicle.CustomerId = CurrentUser.Id;
+                var VehicleFromDatabase = await _context.Vehicles.AsNoTracking()
+                       .FirstOrDefaultAsync(a => a.Id == id);
+                //vehicle.ImageUpload = VehicleFromDatabase.ImageUpload;
+
+                if (vehicle.ImageUpload != null)
+                {
+                    //Store the image in a temp location as it comes back from the uploader
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        await vehicle.ImageUpload.CopyToAsync(memoryStream);
+                        vehicle.VehicleImage = memoryStream.ToArray();
+                    }
+                }
+                else
+                {
+                    var VehicleFromDatabase2 = await _context.Vehicles.AsNoTracking()
+                       .FirstOrDefaultAsync(a => a.Id == id);
+                    vehicle.VehicleImage = VehicleFromDatabase2.VehicleImage;
+                }
+
+                //var VehicleFromDatabase = await _context.Vehicles.AsNoTracking()
+                //    .FirstOrDefaultAsync(a => a.Id == id);
+                //vehicle.VehicleImage = VehicleFromDatabase.VehicleImage;
+
+                //if (vehicle.VehicleImage != null)
+                //{
+                //    //Store the image in a temp location as it comes back from the uploader
+                //    using (var memoryStream = new MemoryStream())
+                //    {
+                //        await vehicle.ImageUpload.CopyToAsync(memoryStream);
+                //        vehicle.VehicleImage = memoryStream.ToArray();
+                //    }
+                //}
                 try
                 {
                     _context.Update(vehicle);

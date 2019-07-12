@@ -29,17 +29,23 @@ namespace OilOnline.Controllers
             //ViewData["acceptedRequests"] = acceptedRequests == "acceptedRequests";
             
             var currentUser = await GetCurrentUserAsync();
-            var requests = from r in _context.Requests select r;
+            var requests = from r in _context.Requests
+                           .Include(r => r.vehicle)
+                           select r;
             switch (acceptedRequests)
             {
                 case "acceptedRequests":
-                    requests = requests.Where(r => r.MechanicId == currentUser.Id);
+                    requests = requests.Where(r => r.MechanicId == currentUser.Id)
+                        .Include(r => r.vehicle)
+                        ;
                     break;
             }
             if (currentUser.IsMechanic == false)
             {
                     var applicationDbContext = await _context.Requests
-                    .Where(r => r.vehicle.CustomerId == currentUser.Id).ToListAsync();
+                    .Where(r => r.vehicle.CustomerId == currentUser.Id)
+                    .Include(r => r.vehicle)
+                    .ToListAsync();
                 return View(applicationDbContext);   
             }
             else {
@@ -79,7 +85,7 @@ namespace OilOnline.Controllers
             if (vehiclesArray.Count == 0)
                 
             {
-                //Show("You must register a vehicle before requesting this service.");
+                
                 
                 return RedirectToAction("Create", "Vehicles");
             }
@@ -124,14 +130,14 @@ namespace OilOnline.Controllers
                 return NotFound();
             }
 
-            var request = await _context.Requests.FindAsync(id);
+            var request = await _context.Requests
+                .Include(r => r.vehicle)
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (request == null)
             {
                 return NotFound();
             }
-            //ViewData["MechanicId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", request.MechanicId);
-            //ViewData["PaymentTypeId"] = new SelectList(_context.PaymentTypes, "Id", "Id", request.PaymentTypeId);
-            //ViewData["VehicleId"] = new SelectList(_context.Vehicles, "Id", "Id", request.VehicleId);
+            
             return View(request);
         }
 
