@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
@@ -65,7 +66,7 @@ namespace OilOnline.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,PhotoURL,PlateNumber,Make,Model,Year,OilTypeId,CustomerId")] Vehicle vehicle)
+        public async Task<IActionResult> Create([Bind("Id,PlateNumber,Make,ImageUpload,Model,Year,OilTypeId,CustomerId")] Vehicle vehicle)
         {
             if (ModelState.IsValid)
             {
@@ -73,7 +74,17 @@ namespace OilOnline.Controllers
                 vehicle.CustomerId = CurrentUser.Id;
                 _context.Add(vehicle);
                 await _context.SaveChangesAsync();
+                if (vehicle.ImageUpload != null)
+                {
+                    //Store the image in a temp location as it comes back from the uploader
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        await vehicle.ImageUpload.CopyToAsync(memoryStream);
+                        vehicle.VehicleImage = memoryStream.ToArray();
+                    }
+                }
                 return RedirectToAction(nameof(Index));
+
             }
             ViewData["CustomerId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", vehicle.CustomerId);
             ViewData["OilTypeId"] = new SelectList(_context.OilTypes, "Id", "Id", vehicle.OilTypeId);
@@ -104,7 +115,7 @@ namespace OilOnline.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,PhotoURL,PlateNumber,Make,Model,Year,OilTypeId,CustomerId")] Vehicle vehicle)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,PlateNumber,Make,Model,Year,OilTypeId,CustomerId")] Vehicle vehicle)
         {
             if (id != vehicle.Id)
             {
